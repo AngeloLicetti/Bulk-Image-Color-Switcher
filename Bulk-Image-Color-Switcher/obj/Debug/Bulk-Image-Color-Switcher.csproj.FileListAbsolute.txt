@@ -1,0 +1,10 @@
+C:\Users\Pc\source\repos\color-switcher\Bulk-Image-Color-Switcher\Bulk-Image-Color-Switcher\bin\Debug\Bulk-Image-Color-Switcher.exe.config
+C:\Users\Pc\source\repos\color-switcher\Bulk-Image-Color-Switcher\Bulk-Image-Color-Switcher\bin\Debug\Bulk-Image-Color-Switcher.exe
+C:\Users\Pc\source\repos\color-switcher\Bulk-Image-Color-Switcher\Bulk-Image-Color-Switcher\bin\Debug\Bulk-Image-Color-Switcher.pdb
+C:\Users\Pc\source\repos\color-switcher\Bulk-Image-Color-Switcher\Bulk-Image-Color-Switcher\obj\Debug\Bulk-Image-Color-Switcher.csprojAssemblyReference.cache
+C:\Users\Pc\source\repos\color-switcher\Bulk-Image-Color-Switcher\Bulk-Image-Color-Switcher\obj\Debug\Bulk_Image_Color_Switcher.Properties.Resources.resources
+C:\Users\Pc\source\repos\color-switcher\Bulk-Image-Color-Switcher\Bulk-Image-Color-Switcher\obj\Debug\Bulk-Image-Color-Switcher.csproj.GenerateResource.cache
+C:\Users\Pc\source\repos\color-switcher\Bulk-Image-Color-Switcher\Bulk-Image-Color-Switcher\obj\Debug\Bulk-Image-Color-Switcher.csproj.CoreCompileInputs.cache
+C:\Users\Pc\source\repos\color-switcher\Bulk-Image-Color-Switcher\Bulk-Image-Color-Switcher\obj\Debug\Bulk-Image-Color-Switcher.exe
+C:\Users\Pc\source\repos\color-switcher\Bulk-Image-Color-Switcher\Bulk-Image-Color-Switcher\obj\Debug\Bulk-Image-Color-Switcher.pdb
+C:\Users\Pc\source\repos\color-switcher\Bulk-Image-Color-Switcher\Bulk-Image-Color-Switcher\obj\Debug\Bulk_Image_Color_Switcher.frmBulkImageColorSwitcher.resources

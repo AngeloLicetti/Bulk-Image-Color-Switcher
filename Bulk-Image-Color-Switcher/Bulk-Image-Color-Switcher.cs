@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -18,6 +19,8 @@ namespace Bulk_Image_Color_Switcher
         public frmBulkImageColorSwitcher()
         {
             InitializeComponent();
+
+            Control.CheckForIllegalCrossThreadCalls = false;
 
             //todo esto será comentado:
             btnColorAnterior.BackColor = Color.FromArgb(77,255,0);//verde mio
@@ -46,6 +49,22 @@ namespace Bulk_Image_Color_Switcher
             }
         }
 
+        private void btnColorAnterior_Click(object sender, EventArgs e)
+        {
+            if (cdColorAnterior.ShowDialog() == DialogResult.OK)
+            {
+                btnColorAnterior.BackColor = cdColorAnterior.Color;
+            }
+        }
+
+        private void btnColorNuevo_Click(object sender, EventArgs e)
+        {
+            if (cdColorNuevo.ShowDialog() == DialogResult.OK)
+            {
+                btnColorNuevo.BackColor = cdColorNuevo.Color;
+            }
+        }
+
         private void btnReemplazarColor_Click(object sender, EventArgs e)
         {
             if (carpetaOrigen == null || carpetaOrigen == "" || carpetaDestino == null || carpetaDestino == "")
@@ -56,19 +75,60 @@ namespace Bulk_Image_Color_Switcher
             }
             if (!bgwReemplazarColor.IsBusy)
             {
-                try
-                {
-                    lblMensaje.Text = "Convirtiendo...Espera unos segundos...";
-                    bgwReemplazarColor.RunWorkerAsync();
-                }
-                catch
-                {
+                lblMensaje.Text = "Convirtiendo...Espera unos segundos...";
+                bgwReemplazarColor.RunWorkerAsync();
+            }
+        }
 
-                }
-                finally
+
+        //creditos del uso del bgWorker:
+        //https://www.youtube.com/watch?v=rtv_eknT3Rg
+        private void bgwReemplazarColor_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                lblMensaje.Text = "Iniciando proceso";
+
+                bloquearBotones();
+                //creditos de esta pequeña parte del codigo:
+                //https://stackoverflow.com/questions/163162/can-you-call-directory-getfiles-with-multiple-filters/8363526
+                var rutasDeImagenesEnOrigen = Directory.GetFiles(carpetaOrigen, "*.*", SearchOption.AllDirectories).Where(s => s.EndsWith(".png", StringComparison.OrdinalIgnoreCase) || s.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) || s.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase));
+
+                Bitmap tempImg;
+                string tempImgRuta, tempImgNombre;
+                int i = 0;
+                int totalImagenes = rutasDeImagenesEnOrigen.ToList().Count;
+
+                foreach (string rutaDeImagen in rutasDeImagenesEnOrigen)
                 {
-                    lblMensaje.Text = "";
+                    if (bgwReemplazarColor.CancellationPending)
+                    {
+                        e.Cancel = true;
+                        MessageBox.Show("Proceso cancelado :c");
+                        return;
+                    }
+
+                    tempImg = new Bitmap(rutaDeImagen);
+                    tempImg = reemplazarColor(tempImg, btnColorAnterior.BackColor, btnColorNuevo.BackColor);
+
+                    //creditos de esta pequeña parte del codigo:
+                    //https://www.it-swarm.dev/es/c%23/obtener-nombre-de-archivo-de-una-cadena-de-ruta-en-c/940642589/
+                    string[] tempImgRutaPartida = rutaDeImagen.Split('\\');
+                    tempImgNombre = tempImgRutaPartida.Last();
+
+                    lblMensaje.Text = i + "/" + totalImagenes + " imágenes procesadas - " + "Procesando imagen: " + tempImgNombre;
+
+                    tempImgRuta = carpetaDestino + "\\" + tempImgNombre;
+                    guardarImagen(tempImg, tempImgRuta);
+
+                    bgwReemplazarColor.ReportProgress(++i * 100 / totalImagenes);
                 }
+                MessageBox.Show("¡Listo! Las imágenes con el color reemplazado fueron creadas :D");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                MessageBox.Show("Ocurrió un error. Verifica que todos los valores sean correctos e intenta de nuevo, crack ;)");
             }
         }
 
@@ -92,54 +152,16 @@ namespace Bulk_Image_Color_Switcher
             return imagenNueva;
         }
 
-
-        //creditos del uso del bgWorker:
-        //https://www.youtube.com/watch?v=rtv_eknT3Rg
-        private void bgwReemplazarColor_DoWork(object sender, DoWorkEventArgs e)
-        {
-            try
-            {
-                //creditos de esta pequeña parte del codigo:
-                //https://stackoverflow.com/questions/163162/can-you-call-directory-getfiles-with-multiple-filters/8363526
-                var rutasDeImagenesEnOrigen = Directory.GetFiles(carpetaOrigen, "*.*", SearchOption.AllDirectories).Where(s => s.EndsWith(".png", StringComparison.OrdinalIgnoreCase) || s.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) || s.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase));
-
-                Bitmap tempImg;
-                string tempImgRuta, tempImgNombre;
-                int i = 0;
-
-                foreach (string rutaDeImagen in rutasDeImagenesEnOrigen)
-                {
-                    if (bgwReemplazarColor.CancellationPending)
-                    {
-                        e.Cancel = true;
-                        MessageBox.Show("Proceso cancelado :c");
-                        return;
-                    }
-                    tempImg = new Bitmap(rutaDeImagen);
-                    tempImg = reemplazarColor(tempImg, btnColorAnterior.BackColor, btnColorNuevo.BackColor);
-
-                    //creditos de esta pequeña parte del codigo:
-                    //https://www.it-swarm.dev/es/c%23/obtener-nombre-de-archivo-de-una-cadena-de-ruta-en-c/940642589/
-                    string[] tempImgRutaPartida = rutaDeImagen.Split('\\');
-                    tempImgNombre = tempImgRutaPartida.Last(); ;
-
-                    tempImgRuta = carpetaDestino + "\\" + tempImgNombre;
-                    guardarImagen(tempImg, tempImgRuta);
-
-                    bgwReemplazarColor.ReportProgress(++i * 100 / rutasDeImagenesEnOrigen.ToList().Count);
-                }
-                MessageBox.Show("¡Listo! Las imágenes con el color reemplazado fueron creadas :D");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                MessageBox.Show("Ocurrió un error. Verifica que todos los valores sean correctos e intenta de nuevo, crack ;)");
-            }
-        }
-
         private void bgwReemplazarColor_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             pgProgreso.Value = e.ProgressPercentage;
+        }
+
+        private void bgwReemplazarColor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            pgProgreso.Value = 0;
+            lblMensaje.Text = "";
+            desbloquearBotones();
         }
 
         private void btnCancelar_Click(object sender, EventArgs e)
@@ -150,9 +172,24 @@ namespace Bulk_Image_Color_Switcher
             }
         }
 
-        private void bgwReemplazarColor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void bloquearBotones()
         {
-            pgProgreso.Value = 0;
+            btnCargarDestino.Enabled = false;
+            btnCargarOrigen.Enabled = false;
+            btnColorAnterior.Enabled = false;
+            btnColorNuevo.Enabled = false;
+            btnReemplazarColor.Enabled = false;
+            btnSalir.Enabled = false;
+        }
+
+        private void desbloquearBotones()
+        {
+            btnCargarDestino.Enabled = true;
+            btnCargarOrigen.Enabled = true;
+            btnColorAnterior.Enabled = true;
+            btnColorNuevo.Enabled = true;
+            btnReemplazarColor.Enabled = true;
+            btnSalir.Enabled = true;
         }
 
         //creditos de esta parte del codigo:
@@ -173,22 +210,6 @@ namespace Bulk_Image_Color_Switcher
             return null;
         }
 
-        private void btnColorAnterior_Click(object sender, EventArgs e)
-        {
-            if(cdColorAnterior.ShowDialog() == DialogResult.OK)
-            {
-                btnColorAnterior.BackColor = cdColorAnterior.Color;
-            }
-        }
-
-        private void btnColorNuevo_Click(object sender, EventArgs e)
-        {
-            if (cdColorNuevo.ShowDialog() == DialogResult.OK)
-            {
-                btnColorNuevo.BackColor = cdColorNuevo.Color;
-            }
-        }
-
         //creditos de esta parte del codigo:
         //https://efundies.com/c-sharp-save-png/
         //guarda la imagen en la rutaConNombre especificada
@@ -204,6 +225,16 @@ namespace Bulk_Image_Color_Switcher
             {
                 throw new Exception();
             }
+        }
+
+        private void llGiovanniInvencible_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("https://www.giovanniinvencible.com");
+        }
+
+        private void btnSalir_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

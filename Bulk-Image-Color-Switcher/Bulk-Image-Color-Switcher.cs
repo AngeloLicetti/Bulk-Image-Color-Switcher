@@ -15,14 +15,13 @@ namespace Bulk_Image_Color_Switcher
     public partial class frmBulkImageColorSwitcher : Form
     {
         string carpetaOrigen, carpetaDestino;
-        Color colorAnterior, colorNuevo;
         public frmBulkImageColorSwitcher()
         {
             InitializeComponent();
 
             //todo esto será comentado:
-            colorAnterior = Color.FromArgb(77,255,0);//verde mio
-            colorNuevo = Color.FromArgb(0, 0, 255);//azul puro
+            btnColorAnterior.BackColor = Color.FromArgb(77,255,0);//verde mio
+            btnColorNuevo.BackColor = Color.FromArgb(0, 0, 255);//azul puro
         }
 
         private void btnCargarOrigen_Click(object sender, EventArgs e)
@@ -53,12 +52,6 @@ namespace Bulk_Image_Color_Switcher
             {
                 //FALTA ESPECIFICAR ALGUNA DE LAS CARPETAS
                 lblMensaje.Text = "Falta especificar alguna de las carpetas";
-                return;
-            }
-            if (colorAnterior.IsEmpty || colorNuevo.IsEmpty)
-            {
-                //FALTA ESPECIFICAR ALGUNO DE LOS COLORES
-                lblMensaje.Text = "Falta especificar alguno de los colores";
                 return;
             }
             if (!bgwReemplazarColor.IsBusy)
@@ -99,6 +92,9 @@ namespace Bulk_Image_Color_Switcher
             return imagenNueva;
         }
 
+
+        //creditos del uso del bgWorker:
+        //https://www.youtube.com/watch?v=rtv_eknT3Rg
         private void bgwReemplazarColor_DoWork(object sender, DoWorkEventArgs e)
         {
             try
@@ -109,10 +105,18 @@ namespace Bulk_Image_Color_Switcher
 
                 Bitmap tempImg;
                 string tempImgRuta, tempImgNombre;
+                int i = 0;
+
                 foreach (string rutaDeImagen in rutasDeImagenesEnOrigen)
                 {
+                    if (bgwReemplazarColor.CancellationPending)
+                    {
+                        e.Cancel = true;
+                        MessageBox.Show("Proceso cancelado :c");
+                        return;
+                    }
                     tempImg = new Bitmap(rutaDeImagen);
-                    tempImg = reemplazarColor(tempImg, colorAnterior, colorNuevo);
+                    tempImg = reemplazarColor(tempImg, btnColorAnterior.BackColor, btnColorNuevo.BackColor);
 
                     //creditos de esta pequeña parte del codigo:
                     //https://www.it-swarm.dev/es/c%23/obtener-nombre-de-archivo-de-una-cadena-de-ruta-en-c/940642589/
@@ -122,8 +126,7 @@ namespace Bulk_Image_Color_Switcher
                     tempImgRuta = carpetaDestino + "\\" + tempImgNombre;
                     guardarImagen(tempImg, tempImgRuta);
 
-                    bgwReemplazarColor.ReportProgress(100 / rutasDeImagenesEnOrigen.ToList().Count);
-                    Console.WriteLine("Cantidad de imagenes: " + rutasDeImagenesEnOrigen.ToList().Count);
+                    bgwReemplazarColor.ReportProgress(++i * 100 / rutasDeImagenesEnOrigen.ToList().Count);
                 }
                 MessageBox.Show("¡Listo! Las imágenes con el color reemplazado fueron creadas :D");
             }
@@ -141,7 +144,15 @@ namespace Bulk_Image_Color_Switcher
 
         private void btnCancelar_Click(object sender, EventArgs e)
         {
-            bgwReemplazarColor.CancelAsync();
+            if (bgwReemplazarColor.IsBusy)
+            {
+                bgwReemplazarColor.CancelAsync();
+            }
+        }
+
+        private void bgwReemplazarColor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            pgProgreso.Value = 0;
         }
 
         //creditos de esta parte del codigo:
@@ -161,7 +172,23 @@ namespace Bulk_Image_Color_Switcher
             }
             return null;
         }
-        
+
+        private void btnColorAnterior_Click(object sender, EventArgs e)
+        {
+            if(cdColorAnterior.ShowDialog() == DialogResult.OK)
+            {
+                btnColorAnterior.BackColor = cdColorAnterior.Color;
+            }
+        }
+
+        private void btnColorNuevo_Click(object sender, EventArgs e)
+        {
+            if (cdColorNuevo.ShowDialog() == DialogResult.OK)
+            {
+                btnColorNuevo.BackColor = cdColorNuevo.Color;
+            }
+        }
+
         //creditos de esta parte del codigo:
         //https://efundies.com/c-sharp-save-png/
         //guarda la imagen en la rutaConNombre especificada

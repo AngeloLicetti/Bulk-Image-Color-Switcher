@@ -43,6 +43,12 @@
             this.btnCancelar = new System.Windows.Forms.Button();
             this.bgwReemplazarColor = new System.ComponentModel.BackgroundWorker();
             this.label3 = new System.Windows.Forms.Label();
+            this.cdColorAnterior = new System.Windows.Forms.ColorDialog();
+            this.btnColorAnterior = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.btnColorNuevo = new System.Windows.Forms.Button();
+            this.cdColorNuevo = new System.Windows.Forms.ColorDialog();
             this.SuspendLayout();
             // 
             // txtOrigen
@@ -54,6 +60,7 @@
             // 
             // btnCargarOrigen
             // 
+            this.btnCargarOrigen.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnCargarOrigen.Location = new System.Drawing.Point(439, 39);
             this.btnCargarOrigen.Name = "btnCargarOrigen";
             this.btnCargarOrigen.Size = new System.Drawing.Size(75, 23);
@@ -80,6 +87,7 @@
             // 
             // btnCargarDestino
             // 
+            this.btnCargarDestino.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnCargarDestino.Location = new System.Drawing.Point(439, 99);
             this.btnCargarDestino.Name = "btnCargarDestino";
             this.btnCargarDestino.Size = new System.Drawing.Size(75, 23);
@@ -99,6 +107,7 @@
             // 
             // btnReemplazarColor
             // 
+            this.btnReemplazarColor.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnReemplazarColor.Location = new System.Drawing.Point(12, 200);
             this.btnReemplazarColor.Name = "btnReemplazarColor";
             this.btnReemplazarColor.Size = new System.Drawing.Size(502, 23);
@@ -121,10 +130,12 @@
             this.pgProgreso.Location = new System.Drawing.Point(65, 240);
             this.pgProgreso.Name = "pgProgreso";
             this.pgProgreso.Size = new System.Drawing.Size(449, 23);
+            this.pgProgreso.Step = 5;
             this.pgProgreso.TabIndex = 9;
             // 
             // btnCancelar
             // 
+            this.btnCancelar.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnCancelar.Location = new System.Drawing.Point(12, 304);
             this.btnCancelar.Name = "btnCancelar";
             this.btnCancelar.Size = new System.Drawing.Size(502, 23);
@@ -139,6 +150,7 @@
             this.bgwReemplazarColor.WorkerSupportsCancellation = true;
             this.bgwReemplazarColor.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwReemplazarColor_DoWork);
             this.bgwReemplazarColor.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgwReemplazarColor_ProgressChanged);
+            this.bgwReemplazarColor.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgwReemplazarColor_RunWorkerCompleted);
             // 
             // label3
             // 
@@ -149,15 +161,59 @@
             this.label3.TabIndex = 6;
             this.label3.Text = "Progreso:";
             // 
+            // btnColorAnterior
+            // 
+            this.btnColorAnterior.BackColor = System.Drawing.Color.White;
+            this.btnColorAnterior.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnColorAnterior.Location = new System.Drawing.Point(110, 135);
+            this.btnColorAnterior.Name = "btnColorAnterior";
+            this.btnColorAnterior.Size = new System.Drawing.Size(40, 40);
+            this.btnColorAnterior.TabIndex = 10;
+            this.btnColorAnterior.UseVisualStyleBackColor = false;
+            this.btnColorAnterior.Click += new System.EventHandler(this.btnColorAnterior_Click);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(12, 149);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(92, 13);
+            this.label4.TabIndex = 6;
+            this.label4.Text = "Reemplazar color:";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(197, 149);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(51, 13);
+            this.label5.TabIndex = 6;
+            this.label5.Text = "por color:";
+            // 
+            // btnColorNuevo
+            // 
+            this.btnColorNuevo.BackColor = System.Drawing.Color.White;
+            this.btnColorNuevo.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnColorNuevo.Location = new System.Drawing.Point(254, 135);
+            this.btnColorNuevo.Name = "btnColorNuevo";
+            this.btnColorNuevo.Size = new System.Drawing.Size(40, 40);
+            this.btnColorNuevo.TabIndex = 10;
+            this.btnColorNuevo.UseVisualStyleBackColor = false;
+            this.btnColorNuevo.Click += new System.EventHandler(this.btnColorNuevo_Click);
+            // 
             // frmBulkImageColorSwitcher
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(565, 385);
+            this.Controls.Add(this.btnColorNuevo);
+            this.Controls.Add(this.btnColorAnterior);
             this.Controls.Add(this.pgProgreso);
             this.Controls.Add(this.lblMensaje);
             this.Controls.Add(this.btnCancelar);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.btnReemplazarColor);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -189,6 +245,12 @@
         private System.Windows.Forms.Button btnCancelar;
         private System.ComponentModel.BackgroundWorker bgwReemplazarColor;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ColorDialog cdColorAnterior;
+        private System.Windows.Forms.Button btnColorAnterior;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Button btnColorNuevo;
+        private System.Windows.Forms.ColorDialog cdColorNuevo;
     }
 }
 
